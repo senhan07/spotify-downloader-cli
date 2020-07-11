@@ -1,6 +1,17 @@
 #!/bin/bash
 fileformat="{artist}/{album}/{track-name}.{output-ext}"
 cd /mnt/d/Music/Download/
+check(){
+	cat /mnt/d/Music/Download/
+}
+if grep -q 1 "/mnt/c/Users/losen/manual";
+then
+	mode=$'\e[32mEnable\e[0m'
+	manual="-m"
+else
+	mode=$'\e[31mDisable\e[0m'
+	manual=""
+fi
 while :
 do
 clear
@@ -14,6 +25,7 @@ echo -n "Download Location: "
 pwd | cut -c 13-
 echo "Press E to Change Location	"
 echo ""
+echo -e "Manual Mode: ${mode}"
 read -p $'\e[5m\e[31mPaste Spotify URL\e[0m: ' url
 if [[ $url =~ (track) ]]; then
 		clear
@@ -21,7 +33,7 @@ if [[ $url =~ (track) ]]; then
 		echo "Downloading..."
 		echo "------------------------------"
 		echo ""
-		spotdl --song $url --output-file $fileformat
+		spotdl --song $url $manual --output-file $fileformat
 		echo ""
 		echo "------------------------------"
 		echo "Press any key to continue"
@@ -98,11 +110,23 @@ else
 				done;
 			else
 				if [[ $url =~ (e|E) ]];then
-				clear
-				cd /mnt/d/Music/Download/
-				printf "Please select folder:\n"
-				select d in */; do test -n "$d" && break; echo ">>> Invalid Selection"; done
-				cd "$d"
+					clear
+					cd /mnt/d/Music/Download/
+					printf "Please select folder:\n"
+					select d in */; do test -n "$d" && break; echo ">>> Invalid Selection"; done
+					cd "$d"
+					
+					else
+						if [[ $url =~ (m|M) ]];then	
+							if grep -q 1 "/mnt/c/Users/losen/manual"
+								then
+									echo "0" > /mnt/c/Users/losen/manual
+									/bin/bash /mnt/c/Users/losen/spotify.sh
+								else
+									echo "1" > /mnt/c/Users/losen/manual
+									/bin/bash /mnt/c/Users/losen/spotify.sh
+							fi
+						fi
 				fi
 			fi
 		fi
